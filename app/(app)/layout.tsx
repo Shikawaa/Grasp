@@ -2,6 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { SidebarImportButton } from "@/components/sidebar-import-button";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/app/actions/auth";
 
@@ -40,6 +41,11 @@ export default async function AppLayout({
                     <SidebarNav />
                 </div>
 
+                {/* + Import button */}
+                <div className="px-3 pb-3">
+                    <SidebarImportButton />
+                </div>
+
                 {/* User section at bottom */}
                 <div className="border-t border-[rgba(79,70,229,0.15)] px-4 py-3">
                     <p className="text-xs text-[#A1A1AA] truncate">{user.email}</p>
@@ -50,7 +56,7 @@ export default async function AppLayout({
             <div className="flex flex-col flex-1 min-w-0">
                 {/* Header */}
                 <header className="flex items-center justify-between h-16 px-6 border-b border-[rgba(79,70,229,0.15)] bg-[#080914] shrink-0">
-                    {/* Mobile: show logo (sidebar is hidden) */}
+                    {/* Mobile: show logo */}
                     <div className="flex items-center gap-2 md:hidden">
                         <Image
                             src="/grasp-logo.svg"
@@ -60,10 +66,7 @@ export default async function AppLayout({
                             priority
                         />
                     </div>
-
-                    {/* Desktop: empty left side */}
                     <div className="hidden md:block" />
-
                     {/* Sign out */}
                     <form action={signOut}>
                         <Button

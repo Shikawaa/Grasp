@@ -3,15 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-    LayoutDashboard,
-    Upload,
-    Library,
-} from "lucide-react";
+import { LayoutDashboard, Library } from "lucide-react";
 
 const navItems = [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
-    { label: "Import", href: "/import", icon: Upload },
     { label: "Library", href: "/library", icon: Library },
 ];
 
