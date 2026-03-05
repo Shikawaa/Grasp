@@ -4,25 +4,36 @@
 
 @layer base {
   :root {
-    --background: #F9FAFB;
-    --foreground: #111827;
-    --card: #FFFFFF;
-    --card-foreground: #111827;
-    --popover: #FFFFFF;
-    --popover-foreground: #111827;
-    --primary: #3730A3;
+    /* ── Grasp dark palette ──────────────────────────────────── */
+    --background: #080914;
+    --surface: #11121F;
+    --primary: #4F46E5;
+    --primary-glow: rgba(79, 70, 229, 0.15);
+    --primary-hover-border: rgba(129, 140, 248, 0.4);
+    --primary-hover-shadow: 0 0 20px rgba(79, 70, 229, 0.1);
+    --badge-bg: rgba(79, 70, 229, 0.1);
+    --text-main: #F4F4F5;
+    --text-muted: #A1A1AA;
+    --border-soft: rgba(79, 70, 229, 0.15);
+
+    /* ── Shadcn semantic tokens (dark) ────────────────────────── */
+    --foreground: #F4F4F5;
+    --card: #11121F;
+    --card-foreground: #F4F4F5;
+    --popover: #11121F;
+    --popover-foreground: #F4F4F5;
     --primary-foreground: #FFFFFF;
-    --secondary: #F3F4F6;
-    --secondary-foreground: #111827;
-    --muted: #F3F4F6;
-    --muted-foreground: #6B7280;
-    --accent: #06B6D4;
+    --secondary: #1A1B2E;
+    --secondary-foreground: #F4F4F5;
+    --muted: #1A1B2E;
+    --muted-foreground: #A1A1AA;
+    --accent: #4F46E5;
     --accent-foreground: #FFFFFF;
     --destructive: #EF4444;
     --destructive-foreground: #FFFFFF;
-    --border: #E5E7EB;
-    --input: #E5E7EB;
-    --ring: #3730A3;
+    --border: #1D1E35;
+    --input: #1D1E35;
+    --ring: #4F46E5;
     --radius: 0.5rem;
   }
 
@@ -35,6 +46,122 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    background-color: var(--background);
+    color: var(--text-main);
+    font-family: var(--font-geist-sans), sans-serif;
   }
+}
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+.card,
+[data-slot="card"] {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 12px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover,
+[data-slot="card"]:hover {
+  border-color: var(--primary-hover-border) !important;
+  box-shadow: var(--primary-hover-shadow) !important;
+}
+
+/* ── Inputs ─────────────────────────────────────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 8px !important;
+  color: var(--text-main) !important;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+textarea:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: none !important;
+  ring: none !important;
+}
+
+/* Autofill flash fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #11121F inset !important;
+  -webkit-text-fill-color: #F4F4F5 !important;
+  caret-color: #F4F4F5;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+/* Primary */
+button[data-variant="default"],
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Outline / ghost dark border */
+button[data-variant="outline"],
+button[data-variant="ghost"] {
+  border: 1px solid var(--border-soft);
+  color: var(--text-main);
+  background: transparent;
+  border-radius: 8px;
+}
+
+button[data-variant="outline"]:hover,
+button[data-variant="ghost"]:hover {
+  border-color: var(--primary-hover-border);
+  box-shadow: var(--primary-hover-shadow);
+}
+
+/* ── Markdown prose (dark) ──────────────────────────────────────── */
+.prose {
+  --tw-prose-body: #F4F4F5;
+  --tw-prose-headings: #F4F4F5;
+  --tw-prose-lead: #A1A1AA;
+  --tw-prose-links: #4F46E5;
+  --tw-prose-bold: #F4F4F5;
+  --tw-prose-counters: #A1A1AA;
+  --tw-prose-bullets: rgba(79, 70, 229, 0.5);
+  --tw-prose-hr: rgba(79, 70, 229, 0.15);
+  --tw-prose-quotes: #F4F4F5;
+  --tw-prose-quote-borders: rgba(79, 70, 229, 0.3);
+  --tw-prose-captions: #A1A1AA;
+  --tw-prose-code: #F4F4F5;
+  --tw-prose-pre-code: #F4F4F5;
+  --tw-prose-pre-bg: #11121F;
+  --tw-prose-th-borders: rgba(79, 70, 229, 0.15);
+  --tw-prose-td-borders: rgba(79, 70, 229, 0.15);
+}
+
+/* ── Tabs (Shadcn) ──────────────────────────────────────────────── */
+[role="tablist"] {
+  background-color: #11121F;
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+[role="tab"] {
+  color: #A1A1AA;
+  border-radius: 6px;
+}
+
+[role="tab"][data-state="active"] {
+  background-color: rgba(79, 70, 229, 0.15);
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+/* ── Dropdown / Popover dark surfaces ───────────────────────────── */
+[data-radix-popper-content-wrapper]>div,
+[role="menu"],
+[role="listbox"] {
+  background-color: #11121F !important;
+  border: 1px solid rgba(79, 70, 229, 0.15) !important;
 }
