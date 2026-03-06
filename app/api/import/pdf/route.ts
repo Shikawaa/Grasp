@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Mistral } from "@mistralai/mistralai";
+import { summarize, extractTitle } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
 import { extractText, getDocumentProxy } from "unpdf";
 
@@ -68,49 +68,20 @@ export async function POST(request: Request) {
     // Extract title from filename
     const title = file.name.replace(/\.pdf$/i, "").trim() || "Untitled PDF";
 
-    // ── 4. Summarize with Mistral ─────────────────────────────────
+    // ── 4. Summarize with Gemini 2.5 Flash ────────────────────────────────
     let summary: string;
     let aiTitle: string = title;
-
     try {
-        const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY! });
-        const response = await mistral.chat.complete({
-            model: "mistral-small-latest",
-            messages: [
-                {
-                    role: "system",
-                    content:
-                        'You are a learning assistant. Analyze the following PDF content and return ONLY a valid JSON object:\n{"title": "a short title, max 8 words", "summary": "full markdown summary with headers, bullet points, and key concepts. Be concise but complete."}\nNo text outside the JSON object.',
-                },
-                {
-                    role: "user",
-                    content: rawText,
-                },
-            ],
-        });
-
-        const raw = (response.choices?.[0]?.message?.content as string) ?? "";
-
+        const raw = await summarize(rawText, "pdf");
         if (!raw) {
             return NextResponse.json({ error: "Could not generate summary. Please try again." }, { status: 502 });
         }
-
-        try {
-            const cleaned = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-            const parsed = JSON.parse(cleaned);
-            if (typeof parsed.title === "string" && parsed.title.trim()) aiTitle = parsed.title.trim();
-            summary = typeof parsed.summary === "string" && parsed.summary.trim()
-                ? parsed.summary.trim()
-                : raw;
-        } catch {
-            summary = raw;
-        }
-
+        ({ title: aiTitle, summary } = extractTitle(raw, title));
         if (truncated) {
             summary = `> ⚠️ This PDF was very long. Only the first 100,000 characters were analyzed.\n\n${summary}`;
         }
     } catch (err) {
-        console.error("Mistral error:", err);
+        console.error("Gemini error:", err);
         return NextResponse.json({ error: "Could not generate summary. Please try again." }, { status: 502 });
     }
 

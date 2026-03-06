@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Mistral } from "@mistralai/mistralai";
+import { summarize, extractTitle } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
 
 const URL_REGEX = /^https?:\/\/.+/i;
@@ -86,56 +86,25 @@ export async function POST(request: Request) {
         );
     }
 
-    // ── 3. Summarise with Mistral ─────────────────────────────────
+    // ── 3. Summarise with Gemini 2.5 Flash ────────────────────────────────
     let summary: string;
     let aiTitle: string = title;
-
     try {
-        const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY! });
-        const response = await mistral.chat.complete({
-            model: "mistral-small-latest",
-            messages: [
-                {
-                    role: "system",
-                    content:
-                        'You are a learning assistant. Analyze the following article and return ONLY a valid JSON object:\n{"title": "a short title, max 8 words", "summary": "full markdown summary with headers, bullet points, and key concepts. Be concise but complete."}\nNo text outside the JSON object.',
-                },
-                {
-                    role: "user",
-                    content: rawText,
-                },
-            ],
-        });
-
-        const raw = (response.choices?.[0]?.message?.content as string) ?? "";
-
+        const raw = await summarize(rawText, "article");
         if (!raw) {
             return NextResponse.json(
                 { error: "Could not generate summary. Please try again." },
                 { status: 502 }
             );
         }
-
-        try {
-            const cleaned = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-            const parsed = JSON.parse(cleaned);
-            if (typeof parsed.title === "string" && parsed.title.trim()) {
-                aiTitle = parsed.title.trim();
-            }
-            summary = typeof parsed.summary === "string" && parsed.summary.trim()
-                ? parsed.summary.trim()
-                : raw;
-        } catch {
-            summary = raw;
-        }
+        ({ title: aiTitle, summary } = extractTitle(raw, title));
     } catch (err) {
-        console.error("Mistral error:", err);
+        console.error("Gemini error:", err);
         return NextResponse.json(
             { error: "Could not generate summary. Please try again." },
             { status: 502 }
         );
     }
-
     // ── 4. Save to Supabase ───────────────────────────────────────
     try {
         const supabase = createClient();

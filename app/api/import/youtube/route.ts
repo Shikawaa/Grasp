@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Mistral } from "@mistralai/mistralai";
+import { summarize, extractTitle } from "@/lib/gemini";
 import { fetchYouTubeTranscript, TranscriptError } from "@/lib/youtube";
 import { createClient } from "@/lib/supabase/server";
 
@@ -62,51 +62,20 @@ export async function POST(request: Request) {
         );
     }
 
-    // ── 3. Summarise with Mistral (returns JSON with title + summary) ──
+    // ── 3. Summarise with Gemini 2.5 Flash ────────────────────────────────
     let summary: string;
-    let aiTitle: string = title; // fallback to Supadata/InnerTube title
+    let aiTitle: string = title;
     try {
-        const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY! });
-        const response = await mistral.chat.complete({
-            model: "mistral-small-latest",
-            messages: [
-                {
-                    role: "system",
-                    content:
-                        'You are a learning assistant. Analyze the following video transcript and return ONLY a valid JSON object:\n{"title": "a short title, max 8 words", "summary": "full markdown summary with headers, bullet points, and key concepts. Be concise but complete."}\nNo text outside the JSON object.',
-                },
-                {
-                    role: "user",
-                    content: transcript,
-                },
-            ],
-        });
-
-        const raw = (response.choices?.[0]?.message?.content as string) ?? "";
-
+        const raw = await summarize(transcript, "youtube");
         if (!raw) {
             return NextResponse.json(
                 { error: "Could not generate summary. Please try again." },
                 { status: 502 }
             );
         }
-
-        // Parse JSON — strip markdown code fences if Mistral added them
-        try {
-            const cleaned = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-            const parsed = JSON.parse(cleaned);
-            if (typeof parsed.title === "string" && parsed.title.trim()) {
-                aiTitle = parsed.title.trim();
-            }
-            summary = typeof parsed.summary === "string" && parsed.summary.trim()
-                ? parsed.summary.trim()
-                : raw;
-        } catch {
-            // Mistral didn't return valid JSON — treat full response as summary
-            summary = raw;
-        }
+        ({ title: aiTitle, summary } = extractTitle(raw, title));
     } catch (err) {
-        console.error("Mistral error:", err);
+        console.error("Gemini error:", err);
         return NextResponse.json(
             { error: "Could not generate summary. Please try again." },
             { status: 502 }
@@ -143,7 +112,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Failed to save content." }, { status: 500 });
         }
 
-        return NextResponse.json({ id: data.id, title: aiTitle, summary }, { status: 200 });
+        return NextResponse.json({ id: data.id, title, summary }, { status: 200 });
     } catch (err) {
         console.error("DB error:", err);
         return NextResponse.json({ error: "Failed to save content." }, { status: 500 });
