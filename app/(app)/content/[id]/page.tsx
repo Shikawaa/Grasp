@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, ArrowLeft } from "lucide-react";
+import { ExternalLink, ArrowLeft, FileText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { ContentTitleEditor } from "@/components/content-title-editor";
 import { ContentDeleteButton } from "@/components/content-delete-button";
@@ -47,6 +47,15 @@ export default async function ContentPage({
         redirect("/");
     }
 
+    // For PDFs: generate a signed URL from Supabase Storage (valid 1 hour)
+    let pdfSignedUrl: string | null = null;
+    if (content.type === "pdf") {
+        const { data: signed } = await supabase.storage
+            .from("pdfs")
+            .createSignedUrl(`${user.id}/${content.id}.pdf`, 3600);
+        pdfSignedUrl = signed?.signedUrl ?? null;
+    }
+
     const displayTitle = content.title ?? content.source_url ?? "Untitled";
     const createdDate = new Date(content.created_at).toLocaleDateString("en-US", {
         year: "numeric", month: "long", day: "numeric",
@@ -86,6 +95,17 @@ export default async function ContentPage({
                     >
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         {content.source_url}
+                    </a>
+                )}
+                {pdfSignedUrl && (
+                    <a
+                        href={pdfSignedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                    >
+                        <FileText className="h-3.5 w-3.5 shrink-0" />
+                        View PDF
                     </a>
                 )}
                 <span>{createdDate}</span>

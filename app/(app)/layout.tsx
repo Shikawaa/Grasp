@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SidebarNav } from "@/components/sidebar-nav";
@@ -26,30 +27,32 @@ export default async function AppLayout({
             <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-[rgba(79,70,229,0.15)] bg-[#11121F]">
                 {/* Logo */}
                 <div className="flex items-center h-16 px-4 border-b border-[rgba(79,70,229,0.15)]">
-                    <Image
-                        src="/grasp-logo.svg"
-                        alt="Grasp"
-                        width={32}
-                        height={32}
-                        className="mx-auto"
-                        priority
-                    />
+                    <Link href="/" className="mx-auto">
+                        <Image
+                            src="/grasp-logo.svg"
+                            alt="Grasp — go to Dashboard"
+                            width={32}
+                            height={32}
+                            priority
+                        />
+                    </Link>
+                </div>
+
+                {/* + Import button — just below logo */}
+                <div className="px-3 pt-4 pb-2">
+                    <SidebarImportButton />
                 </div>
 
                 {/* Nav links */}
-                <div className="flex-1 py-4 overflow-y-auto">
+                <div className="flex-1 py-2 overflow-y-auto">
                     <SidebarNav />
-                </div>
-
-                {/* + Import button */}
-                <div className="px-3 pb-3">
-                    <SidebarImportButton />
                 </div>
 
                 {/* User section at bottom */}
                 <div className="border-t border-[rgba(79,70,229,0.15)] px-4 py-3">
                     <p className="text-xs text-[#A1A1AA] truncate">{user.email}</p>
                 </div>
+
             </aside>
 
             {/* ── Right column ─────────────────────────────────────── */}
@@ -61,8 +64,8 @@ export default async function AppLayout({
                         <Image
                             src="/grasp-logo.svg"
                             alt="Grasp"
-                            width={72}
-                            height={22}
+                            width={32}
+                            height={32}
                             priority
                         />
                     </div>
