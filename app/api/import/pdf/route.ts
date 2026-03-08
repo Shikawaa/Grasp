@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { summarize, extractTitle } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
+import { generateFlashcards } from "@/lib/generateFlashcards";
 import { extractText, getDocumentProxy } from "unpdf";
 
 export const runtime = "nodejs";
@@ -122,6 +123,9 @@ export async function POST(request: Request) {
     } catch (err) {
         console.error("Storage upload error (non-fatal):", err);
     }
+
+    // Fire & forget — don't block the response
+    generateFlashcards({ contentId, summary, supabase }).catch(console.error);
 
     return NextResponse.json({ id: contentId }, { status: 200 });
 }

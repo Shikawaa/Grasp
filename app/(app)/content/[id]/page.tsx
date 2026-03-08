@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ArrowLeft, FileText } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import { ContentTitleEditor } from "@/components/content-title-editor";
 import { ContentDeleteButton } from "@/components/content-delete-button";
+import { ContentTabs } from "@/components/content-tabs";
 
 interface ContentRow {
     id: string;
@@ -15,6 +15,13 @@ interface ContentRow {
     summary: string | null;
     created_at: string;
     user_id: string;
+}
+
+interface Flashcard {
+    id: string;
+    question: string;
+    answer: string;
+    status: "new" | "known" | "review";
 }
 
 function typeLabel(type: string | null): string {
@@ -35,17 +42,26 @@ export default async function ContentPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect("/sign-in");
 
-    const { data } = await supabase
-        .from("contents")
-        .select("id, title, type, source_url, summary, created_at, user_id")
-        .eq("id", params.id)
-        .single();
+    const [{ data }, { data: flashcardData }] = await Promise.all([
+        supabase
+            .from("contents")
+            .select("id, title, type, source_url, summary, created_at, user_id")
+            .eq("id", params.id)
+            .single(),
+        supabase
+            .from("flashcards")
+            .select("id, question, answer, status")
+            .eq("content_id", params.id)
+            .order("created_at", { ascending: true }),
+    ]);
 
     const content = data as ContentRow | null;
 
     if (!content || content.user_id !== user.id) {
         redirect("/");
     }
+
+    const flashcards = (flashcardData ?? []) as Flashcard[];
 
     // For PDFs: generate a signed URL from Supabase Storage (valid 1 hour)
     let pdfSignedUrl: string | null = null;
@@ -114,14 +130,8 @@ export default async function ContentPage({
             {/* Divider */}
             <div className="border-t border-border mb-8" />
 
-            {/* Summary */}
-            {content.summary ? (
-                <article className="prose prose-neutral max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary prose-strong:text-foreground">
-                    <ReactMarkdown>{content.summary}</ReactMarkdown>
-                </article>
-            ) : (
-                <p className="text-muted-foreground text-sm">No summary available.</p>
-            )}
+            {/* Summary + Flashcards tabs */}
+            <ContentTabs contentId={content.id} summary={content.summary} initialFlashcards={flashcards} />
         </div>
     );
 }

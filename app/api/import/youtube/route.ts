@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { summarize, extractTitle } from "@/lib/gemini";
 import { fetchYouTubeTranscript, TranscriptError } from "@/lib/youtube";
 import { createClient } from "@/lib/supabase/server";
+import { generateFlashcards } from "@/lib/generateFlashcards";
 
 const YOUTUBE_REGEX =
     /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)[\w-]{11}(?:[?&].*)?$/;
@@ -111,6 +112,9 @@ export async function POST(request: Request) {
             console.error("Supabase insert error:", error);
             return NextResponse.json({ error: "Failed to save content." }, { status: 500 });
         }
+
+        // Fire & forget — don't block the response
+        generateFlashcards({ contentId: data.id, summary, supabase }).catch(console.error);
 
         return NextResponse.json({ id: data.id, title, summary }, { status: 200 });
     } catch (err) {
