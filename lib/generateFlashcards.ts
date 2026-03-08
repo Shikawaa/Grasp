@@ -2,7 +2,16 @@ import { geminiModel } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-const FLASHCARD_PROMPT = `You are a learning assistant. Based on the following summary, generate between 5 and 10 flashcards to test knowledge.
+const FLASHCARD_PROMPT = `You are a learning assistant. Based on the following summary, generate flashcards to test knowledge of the key concepts.
+
+Determine the number of flashcards based on the content density:
+- Short or focused summary (1-2 topics): generate exactly 4 flashcards
+- Medium summary (3-5 topics): generate exactly 7 flashcards
+- Rich or complex summary (6+ topics or very long): generate exactly 12 flashcards
+
+Never generate more than 12 flashcards regardless of content length.
+Focus on the most important, testable concepts only — no redundancy, no two cards testing the same thing.
+
 Return ONLY a valid JSON array, no markdown, no explanation, no code block:
 [{ "question": "...", "answer": "..." }]
 Questions should be specific and answers concise (1-3 sentences max).
@@ -46,9 +55,12 @@ export async function generateFlashcards({ contentId, summary, supabase: passedC
                 status: "new" as const,
             }));
 
-        if (rows.length === 0) return;
+        // Hard cap — safety net in case Gemini ignores the prompt instruction
+        const capped = rows.slice(0, 12);
 
-        const { error } = await supabase.from("flashcards").insert(rows);
+        if (capped.length === 0) return;
+
+        const { error } = await supabase.from("flashcards").insert(capped);
         if (error) console.error("generateFlashcards: Supabase insert error", error);
     } catch (err) {
         console.error("generateFlashcards: Gemini error", err);

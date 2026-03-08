@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import { FlashcardsDisplay } from "@/components/flashcards-poller";
@@ -21,19 +21,22 @@ interface ContentTabsProps {
 export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTabsProps) {
     const [flashcards, setFlashcards] = useState<Flashcard[]>(initialFlashcards);
     const [timedOut, setTimedOut] = useState(false);
-    const [visible, setVisible] = useState(initialFlashcards.length > 0);
+    const [isRegenerating, setIsRegenerating] = useState(false);
 
     const loaded = useRef(initialFlashcards.length > 0);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    useEffect(() => {
-        // Already have cards — never poll
-        if (loaded.current) return;
+    // ── Shared polling logic (used for initial gen + regenerate) ──
+    const startPolling = useCallback(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-        // Abort after 30 seconds
+        setTimedOut(false);
+
         timeoutRef.current = setTimeout(() => {
             setTimedOut(true);
+            setIsRegenerating(false);
             if (intervalRef.current) clearInterval(intervalRef.current);
         }, 30_000);
 
@@ -47,28 +50,64 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
                     clearTimeout(timeoutRef.current!);
                     loaded.current = true;
                     setFlashcards(data);
-                    requestAnimationFrame(() => setVisible(true));
+                    setIsRegenerating(false);
                 }
             } catch {
-                // Silently ignore network errors during polling
+                // silently ignore
             }
         }, 3_000);
+    }, [contentId]);
 
+    // Initial poll on mount if no cards yet
+    useEffect(() => {
+        if (loaded.current) return;
+        startPolling();
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Run once — state is lifted here, not inside tab content
+    }, [startPolling]);
 
-    const isPolling = flashcards.length === 0 && !timedOut;
+    // ── Regenerate handler ────────────────────────────────────────
+    const handleRegenerate = useCallback(async () => {
+        if (!summary) return;
+        setIsRegenerating(true);
+        setFlashcards([]);
+        loaded.current = false;
+
+        try {
+            // 1. Delete existing cards — must succeed before generating
+            const deleteRes = await fetch(`/api/flashcards?contentId=${contentId}`, { method: "DELETE" });
+            if (!deleteRes.ok) {
+                const body = await deleteRes.json().catch(() => ({}));
+                console.error("[Regenerate] DELETE failed:", deleteRes.status, body);
+                setIsRegenerating(false);
+                return;
+            }
+            const deleteBody = await deleteRes.json();
+            console.log("[Regenerate] DELETE confirmed:", deleteBody);
+
+            // 2. Trigger generation (fire & forget — Gemini call is slow)
+            fetch("/api/flashcards/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contentId }),
+            }).catch(console.error);
+
+            // 3. Poll until new cards arrive (server-fetched, not from local state)
+            startPolling();
+        } catch (err) {
+            console.error("[Regenerate] unexpected error:", err);
+            setIsRegenerating(false);
+        }
+    }, [contentId, summary, startPolling]);
+
+    const isPolling = flashcards.length === 0 && !timedOut && !isRegenerating;
 
     return (
         <Tabs defaultValue="summary" className="w-full">
             <TabsList className="w-full mb-6">
-                <TabsTrigger value="summary" className="flex-1">
-                    Summary
-                </TabsTrigger>
+                <TabsTrigger value="summary" className="flex-1">Summary</TabsTrigger>
                 <TabsTrigger value="flashcards" className="flex-1">
                     Flashcards
                     {flashcards.length > 0 && (
@@ -88,13 +127,16 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
                 )}
             </TabsContent>
 
-            {/* ── Flashcards tab — pure display, no polling state ───── */}
+            {/* ── Flashcards tab ────────────────────────────────────── */}
             <TabsContent value="flashcards">
                 <FlashcardsDisplay
+                    contentId={contentId}
+                    summary={summary ?? ""}
                     flashcards={flashcards}
                     isPolling={isPolling}
                     timedOut={timedOut}
-                    visible={visible}
+                    onRegenerate={handleRegenerate}
+                    isRegenerating={isRegenerating}
                 />
             </TabsContent>
         </Tabs>
