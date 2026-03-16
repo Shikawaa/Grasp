@@ -71,7 +71,7 @@ export default async function DashboardPage() {
                                 </span>
                                 <span className="text-xs text-[#A1A1AA]">{formatRelativeDate(continueItem.created_at)}</span>
                             </div>
-                            <h3 className="text-base font-semibold text-[#F4F4F5] mb-2 group-hover:text-white transition-colors">
+                            <h3 className="text-base font-semibold text-[#F4F4F5] mb-2 group-hover:text-white transition-colors truncate">
                                 {continueItem.title ?? continueItem.source_url ?? "Untitled"}
                             </h3>
                             {continueItem.summary && (
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
                                         {typeLabel(item.type)}
                                     </span>
                                 </div>
-                                <p className="text-sm font-medium text-[#F4F4F5] line-clamp-2 group-hover:text-white transition-colors">
+                                <p className="text-sm font-medium text-[#F4F4F5] line-clamp-2 group-hover:text-white transition-colors break-words">
                                     {item.title ?? item.source_url ?? "Untitled"}
                                 </p>
                                 <p className="text-xs text-[#A1A1AA] mt-2">{formatRelativeDate(item.created_at)}</p>

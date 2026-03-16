@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import { FlashcardsDisplay } from "@/components/flashcards-poller";
+import { ContentChat } from "@/components/content-chat";
 
 interface Flashcard {
     id: string;
@@ -105,8 +106,8 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
     const isPolling = flashcards.length === 0 && !timedOut && !isRegenerating;
 
     return (
-        <Tabs defaultValue="summary" className="w-full">
-            <TabsList className="w-full mb-6">
+        <Tabs defaultValue="summary" className="w-full flex flex-col h-full min-h-0">
+            <TabsList className="w-full shrink-0 mb-6">
                 <TabsTrigger value="summary" className="flex-1">Summary</TabsTrigger>
                 <TabsTrigger value="flashcards" className="flex-1">
                     Flashcards
@@ -114,10 +115,11 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
                         <span className="ml-1.5 text-xs opacity-60">({flashcards.length})</span>
                     )}
                 </TabsTrigger>
+                <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
             </TabsList>
 
             {/* ── Summary tab ───────────────────────────────────────── */}
-            <TabsContent value="summary">
+            <TabsContent value="summary" className="flex-1 overflow-y-auto min-h-0 m-0 data-[state=inactive]:hidden pr-2 pb-6">
                 {summary ? (
                     <article className="prose prose-neutral max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary prose-strong:text-foreground">
                         <ReactMarkdown>{summary}</ReactMarkdown>
@@ -128,7 +130,7 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
             </TabsContent>
 
             {/* ── Flashcards tab ────────────────────────────────────── */}
-            <TabsContent value="flashcards">
+            <TabsContent value="flashcards" className="flex-1 overflow-y-auto min-h-0 m-0 data-[state=inactive]:hidden pr-2 pb-6">
                 <FlashcardsDisplay
                     contentId={contentId}
                     summary={summary ?? ""}
@@ -138,6 +140,11 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
                     onRegenerate={handleRegenerate}
                     isRegenerating={isRegenerating}
                 />
+            </TabsContent>
+
+            {/* ── Chat tab ──────────────────────────────────────────── */}
+            <TabsContent value="chat" className="flex-1 min-h-0 m-0 data-[state=inactive]:hidden">
+                <ContentChat contentId={contentId} />
             </TabsContent>
         </Tabs>
     );

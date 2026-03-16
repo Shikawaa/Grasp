@@ -69,7 +69,7 @@
 
 /* ── Inputs ─────────────────────────────────────────────────────── */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-textarea,
+textarea:not(.chat-input),
 select {
   background-color: var(--surface) !important;
   border: 1px solid var(--border-soft) !important;
@@ -78,7 +78,7 @@ select {
 }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
-textarea:focus {
+textarea:not(.chat-input):focus {
   border-color: var(--primary) !important;
   outline: none !important;
   box-shadow: none !important;
@@ -164,4 +164,12 @@ button[data-variant="ghost"]:hover {
 [role="listbox"] {
   background-color: #11121F !important;
   border: 1px solid rgba(79, 70, 229, 0.15) !important;
+}
+
+.chat-input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
 }

@@ -78,24 +78,25 @@ export default async function ContentPage({
     });
 
     return (
-        <div className="max-w-3xl mx-auto px-6 py-10">
-            {/* Back link */}
-            <Link
-                href="/"
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
-            >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Library
-            </Link>
+        <div className="max-w-3xl w-full mx-auto px-6 pt-10 pb-6 flex flex-col h-full min-h-0 min-w-0">
+            <div className="shrink-0 mb-8 w-full max-w-full">
+                {/* Back link */}
+                <Link
+                    href="/"
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+                >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Library
+                </Link>
 
-            {/* Title + actions row */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-                <ContentTitleEditor contentId={content.id} initialTitle={displayTitle} />
-                <ContentDeleteButton contentId={content.id} />
-            </div>
+                {/* Title + actions row */}
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <ContentTitleEditor contentId={content.id} initialTitle={displayTitle} />
+                    <ContentDeleteButton contentId={content.id} />
+                </div>
 
-            {/* Meta */}
-            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-8">
+                {/* Meta */}
+                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <Badge
                     variant="secondary"
                     className="bg-primary/10 text-primary border-0 text-xs font-medium"
@@ -107,10 +108,10 @@ export default async function ContentPage({
                         href={content.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-foreground transition-colors truncate max-w-xs"
+                        className="inline-flex items-center gap-1 hover:text-foreground transition-colors max-w-[200px] sm:max-w-xs"
                     >
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                        {content.source_url}
+                        <span className="truncate">{content.source_url}</span>
                     </a>
                 )}
                 {pdfSignedUrl && (
@@ -125,13 +126,13 @@ export default async function ContentPage({
                     </a>
                 )}
                 <span>{createdDate}</span>
+                </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-border mb-8" />
-
             {/* Summary + Flashcards tabs */}
-            <ContentTabs contentId={content.id} summary={content.summary} initialFlashcards={flashcards} />
+            <div className="flex-1 min-h-0 mt-8 w-full">
+                <ContentTabs contentId={content.id} summary={content.summary} initialFlashcards={flashcards} />
+            </div>
         </div>
     );
 }
