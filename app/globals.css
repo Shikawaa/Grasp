@@ -173,3 +173,19 @@ button[data-variant="ghost"]:hover {
   -webkit-appearance: none;
   appearance: none;
 }
+
+/* ── Flashcard Flip Animation ─────────────────────── */
+.flashcard-inner {
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flashcard-back {
+  transform: rotateY(180deg);
+}

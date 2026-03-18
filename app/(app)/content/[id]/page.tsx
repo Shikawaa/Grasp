@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ArrowLeft, FileText } from "lucide-react";
 import { ContentTitleEditor } from "@/components/content-title-editor";
 import { ContentDeleteButton } from "@/components/content-delete-button";
+import { ContentShareButton } from "@/components/content-share-button";
 import { ContentTabs } from "@/components/content-tabs";
 
 interface ContentRow {
@@ -15,6 +16,7 @@ interface ContentRow {
     summary: string | null;
     created_at: string;
     user_id: string;
+    share_token: string | null;
 }
 
 interface Flashcard {
@@ -45,7 +47,7 @@ export default async function ContentPage({
     const [{ data }, { data: flashcardData }] = await Promise.all([
         supabase
             .from("contents")
-            .select("id, title, type, source_url, summary, created_at, user_id")
+            .select("id, title, type, source_url, summary, created_at, user_id, share_token")
             .eq("id", params.id)
             .single(),
         supabase
@@ -92,7 +94,10 @@ export default async function ContentPage({
                 {/* Title + actions row */}
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <ContentTitleEditor contentId={content.id} initialTitle={displayTitle} />
-                    <ContentDeleteButton contentId={content.id} />
+                    <div className="flex items-center gap-2">
+                        <ContentShareButton contentId={content.id} initialToken={content.share_token} />
+                        <ContentDeleteButton contentId={content.id} />
+                    </div>
                 </div>
 
                 {/* Meta */}
