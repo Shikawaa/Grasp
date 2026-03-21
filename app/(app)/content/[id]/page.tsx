@@ -6,6 +6,7 @@ import { ExternalLink, ArrowLeft, FileText } from "lucide-react";
 import { ContentTitleEditor } from "@/components/content-title-editor";
 import { ContentDeleteButton } from "@/components/content-delete-button";
 import { ContentShareButton } from "@/components/content-share-button";
+import { AudioPlayer } from "@/components/audio-player";
 import { ContentTabs } from "@/components/content-tabs";
 
 interface ContentRow {
@@ -17,6 +18,7 @@ interface ContentRow {
     created_at: string;
     user_id: string;
     share_token: string | null;
+    audio_url: string | null;
 }
 
 interface Flashcard {
@@ -47,7 +49,7 @@ export default async function ContentPage({
     const [{ data }, { data: flashcardData }] = await Promise.all([
         supabase
             .from("contents")
-            .select("id, title, type, source_url, summary, created_at, user_id, share_token")
+            .select("id, title, type, source_url, summary, created_at, user_id, share_token, audio_url")
             .eq("id", params.id)
             .single(),
         supabase
@@ -131,6 +133,11 @@ export default async function ContentPage({
                     </a>
                 )}
                 <span>{createdDate}</span>
+                </div>
+                
+                {/* Audio Generation + Player */}
+                <div className="mt-8">
+                    <AudioPlayer contentId={content.id} initialAudioUrl={content.audio_url} title={displayTitle} />
                 </div>
             </div>
 

@@ -4,7 +4,7 @@ export const PROMPTS = {
 Rules:
 - Your FIRST line must be a short title (max 8 words), formatted exactly as: # [Title]
 - Always write in English, regardless of the source language
-- Then start with a "## TL;DR" section: 2-3 sentences summarizing the core idea
+- Then start with a "## Overview" section: 2-3 sentences summarizing the core idea
 - Then use "## [Topic]" headers to break down the key concepts
 - Under each header, use bullet points for supporting details
 - Bold the most important terms and key concepts using **term**
