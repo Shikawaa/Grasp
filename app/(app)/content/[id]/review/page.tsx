@@ -28,7 +28,7 @@ export default async function ReviewPage({
         .eq("user_id", user.id)
         .single();
 
-    if (!content) redirect("/");
+    if (!content) redirect("/dashboard");
 
     // Fetch only cards that need reviewing
     const { data: flashcardData } = await supabase

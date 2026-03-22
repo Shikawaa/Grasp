@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { LayoutDashboard, Library } from "lucide-react";
 
 const navItems = [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Library", href: "/library", icon: Library },
 ];
 
@@ -14,7 +14,7 @@ export function SidebarNav() {
     const pathname = usePathname();
 
     const isActive = (href: string) => {
-        if (href === "/") return pathname === "/";
+        if (href === "/dashboard") return pathname === "/dashboard";
         return pathname.startsWith(href);
     };
 

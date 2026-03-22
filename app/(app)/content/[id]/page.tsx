@@ -62,7 +62,7 @@ export default async function ContentPage({
     const content = data as ContentRow | null;
 
     if (!content || content.user_id !== user.id) {
-        redirect("/");
+        redirect("/dashboard");
     }
 
     const flashcards = (flashcardData ?? []) as Flashcard[];
@@ -86,7 +86,7 @@ export default async function ContentPage({
             <div className="shrink-0 mb-8 w-full max-w-full">
                 {/* Back link */}
                 <Link
-                    href="/"
+                    href="/dashboard"
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
                 >
                     <ArrowLeft className="h-4 w-4" />

@@ -38,8 +38,9 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    // Public routes: /sign-in, /sign-up, /auth/callback, /share/[id]
+    // Public routes: /, /sign-in, /sign-up, /auth/callback, /share/[id]
     const isPublicRoute =
+        pathname === "/" ||
         pathname === "/sign-in" ||
         pathname === "/sign-up" ||
         pathname.startsWith("/auth/") ||
@@ -54,7 +55,7 @@ export async function middleware(request: NextRequest) {
     // Redirect authenticated users away from auth pages
     if (user && (pathname === "/sign-in" || pathname === "/sign-up")) {
         const url = request.nextUrl.clone();
-        url.pathname = "/";
+        url.pathname = "/dashboard";
         return NextResponse.redirect(url);
     }
 

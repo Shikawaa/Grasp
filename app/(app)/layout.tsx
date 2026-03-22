@@ -27,7 +27,7 @@ export default async function AppLayout({
             <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-[rgba(79,70,229,0.15)] bg-[#11121F]">
                 {/* Logo */}
                 <div className="flex items-center h-16 px-4 border-b border-[rgba(79,70,229,0.15)]">
-                    <Link href="/" className="mx-auto">
+                    <Link href="/dashboard" className="mx-auto">
                         <Image
                             src="/grasp-logo.svg"
                             alt="Grasp — go to Dashboard"
