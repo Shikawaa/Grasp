@@ -177,7 +177,7 @@ export function AudioPlayer({ contentId, initialAudioUrl, title }: AudioPlayerPr
     // ── Has audio: full player ──
     return (
         <div className="flex flex-col gap-2 w-full">
-            <div className="bg-[#11121F] border border-[rgba(79,70,229,0.15)] rounded-2xl px-5 py-4 w-full flex items-center gap-4">
+            <div className="bg-[#11121F] border border-[rgba(79,70,229,0.15)] rounded-2xl px-3 sm:px-5 py-4 w-full flex items-center gap-2 sm:gap-4">
                 <audio ref={audioRef} src={audioUrl} className="hidden" preload="metadata" />
 
                 <button

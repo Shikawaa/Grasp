@@ -47,7 +47,7 @@ export default async function DashboardPage() {
     // Empty state
     if (items.length === 0) {
         return (
-            <div className="max-w-3xl mx-auto px-6 py-16 flex flex-col items-center justify-center text-center">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 flex flex-col items-center justify-center text-center">
                 <p className="text-xl font-semibold text-[#F4F4F5]">Nothing here yet.</p>
                 <p className="text-sm text-[#A1A1AA] mt-2">Import your first content to get started.</p>
             </div>
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto px-6 py-10 space-y-10">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-10">
 
             {/* ── Continue learning ───────────────────────────────── */}
             {continueItem && (
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                             View all in Library <ArrowRight className="h-3 w-3" />
                         </Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {recentItems.map((item) => (
                             <Link
                                 key={item.id}

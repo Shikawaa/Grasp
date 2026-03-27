@@ -106,8 +106,8 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
     const isPolling = flashcards.length === 0 && !timedOut && !isRegenerating;
 
     return (
-        <Tabs defaultValue="summary" className="w-full flex flex-col h-full min-h-0">
-            <TabsList className="w-full shrink-0 mb-6">
+        <Tabs defaultValue="summary" className="w-full">
+            <TabsList className="w-full mb-6 overflow-x-auto">
                 <TabsTrigger value="summary" className="flex-1">Summary</TabsTrigger>
                 <TabsTrigger value="flashcards" className="flex-1">
                     Flashcards
@@ -119,7 +119,7 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
             </TabsList>
 
             {/* ── Summary tab ───────────────────────────────────────── */}
-            <TabsContent value="summary" className="flex-1 overflow-y-auto min-h-0 m-0 data-[state=inactive]:hidden pr-2 pb-6">
+            <TabsContent value="summary" className="pb-10">
                 {summary ? (
                     <article className="prose prose-neutral max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary prose-strong:text-foreground">
                         <ReactMarkdown>{summary}</ReactMarkdown>
@@ -130,7 +130,7 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
             </TabsContent>
 
             {/* ── Flashcards tab ────────────────────────────────────── */}
-            <TabsContent value="flashcards" className="flex-1 overflow-y-auto min-h-0 m-0 data-[state=inactive]:hidden pr-2 pb-6">
+            <TabsContent value="flashcards" className="pb-10">
                 <FlashcardsDisplay
                     contentId={contentId}
                     summary={summary ?? ""}
@@ -143,7 +143,7 @@ export function ContentTabs({ contentId, summary, initialFlashcards }: ContentTa
             </TabsContent>
 
             {/* ── Chat tab ──────────────────────────────────────────── */}
-            <TabsContent value="chat" className="flex-1 min-h-0 m-0 data-[state=inactive]:hidden">
+            <TabsContent value="chat" className="pb-10">
                 <ContentChat contentId={contentId} />
             </TabsContent>
         </Tabs>

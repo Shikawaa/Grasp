@@ -27,3 +27,28 @@ export async function GET(request: Request) {
 
     return NextResponse.json(data ?? []);
 }
+
+export async function DELETE(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const contentId = searchParams.get("contentId");
+
+    if (!contentId) {
+        return NextResponse.json({ error: "Missing contentId" }, { status: 400 });
+    }
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { error } = await supabase
+        .from("messages")
+        .delete()
+        .eq("content_id", contentId)
+        .eq("user_id", user.id);
+
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+}

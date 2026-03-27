@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -93,6 +93,14 @@ export function ContentChat({ contentId }: ContentChatProps) {
         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
     }, [handleSend]);
 
+    const handleClear = useCallback(async () => {
+        if (loading) return;
+        try {
+            await fetch(`/api/chat/messages?contentId=${contentId}`, { method: "DELETE" });
+            setMessages([]);
+        } catch { /* silent */ }
+    }, [contentId, loading]);
+
     const handleInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInput(e.target.value);
         const el = e.target;
@@ -102,8 +110,21 @@ export function ContentChat({ contentId }: ContentChatProps) {
 
     return (
         <div className="flex flex-col h-full">
+            {/* Clear button */}
+            {messages.length > 0 && (
+                <div className="flex justify-end px-6 pt-3 w-full max-w-[720px] mx-auto">
+                    <button
+                        onClick={handleClear}
+                        disabled={loading}
+                        className="inline-flex items-center gap-1.5 text-xs text-[#A1A1AA] hover:text-red-400 transition-colors disabled:opacity-40"
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Clear history
+                    </button>
+                </div>
+            )}
             {/* Messages */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-6 w-full max-w-[720px] mx-auto">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-6 w-full max-w-[720px] mx-auto">
                 {initialLoading ? (
                     <div className="flex items-center justify-center h-full min-h-[200px]">
                         <p className="text-base text-[#6B7280] font-mono">Loading conversation...</p>

@@ -18,7 +18,7 @@ export default async function LibraryPage() {
     const items = (contents ?? []) as ContentItem[];
 
     return (
-        <div className="max-w-3xl mx-auto px-6 py-10">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
             <div className="mb-8">
                 <h1 className="text-2xl font-semibold text-[#F4F4F5] tracking-tight">Library</h1>
                 <p className="text-sm text-[#A1A1AA] mt-1">All your imported content</p>

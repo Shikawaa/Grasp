@@ -82,8 +82,8 @@ export default async function ContentPage({
     });
 
     return (
-        <div className="max-w-3xl w-full mx-auto px-6 pt-10 pb-6 flex flex-col h-full min-h-0 min-w-0">
-            <div className="shrink-0 mb-8 w-full max-w-full">
+        <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 pt-10 pb-10">
+            <div className="mb-8 w-full">
                 {/* Back link */}
                 <Link
                     href="/"
@@ -94,7 +94,7 @@ export default async function ContentPage({
                 </Link>
 
                 {/* Title + actions row */}
-                <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 mb-4">
                     <ContentTitleEditor contentId={content.id} initialTitle={displayTitle} />
                     <div className="flex items-center gap-2">
                         <ContentShareButton contentId={content.id} initialToken={content.share_token} />
@@ -115,7 +115,7 @@ export default async function ContentPage({
                         href={content.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-foreground transition-colors max-w-[200px] sm:max-w-xs"
+                        className="inline-flex items-center gap-1 hover:text-foreground transition-colors max-w-[160px] sm:max-w-xs"
                     >
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">{content.source_url}</span>
@@ -142,7 +142,7 @@ export default async function ContentPage({
             </div>
 
             {/* Summary + Flashcards tabs */}
-            <div className="flex-1 min-h-0 mt-8 w-full">
+            <div className="mt-8 w-full">
                 <ContentTabs contentId={content.id} summary={content.summary} initialFlashcards={flashcards} />
             </div>
         </div>
